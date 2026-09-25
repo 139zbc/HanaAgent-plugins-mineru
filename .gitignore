@@ -1,0 +1,21 @@
+# Dependencies (this plugin has none, but keep these out of the repo)
+node_modules/
+package-lock.json
+
+# Local Hana / plugin runtime data — never commit credentials, results or history
+config.json
+jobs/
+recovered/
+plugin-data/
+*.zip
+
+# Test and delivery artifacts
+test-fixtures/
+dist/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
