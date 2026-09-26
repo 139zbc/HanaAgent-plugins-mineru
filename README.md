@@ -20,7 +20,7 @@ mineru-document-workbench/      ← 应用目录。这一层就是要发布、�
 ├── manifest.json               v2 清单：能力声明、设置 schema、卡片、网络白名单
 ├── index.js                    入口：defineApp(sdk => ...)，注册工具与后端路由
 ├── v2-ctx.js                   v1 ctx → v2 SDK 适配层（详见文件头注释）
-├── lib/                        业务逻辑，从 v1 原样搬迁
+├── lib/                        业务逻辑（主体从 v1 搬迁，另有导出 / 上传等新增模块）
 │   ├── job-store.v6.js         任务与结果存储
 │   ├── translate.v3.js         翻译管线（分块 / 重试 / 代码块保护）
 │   ├── markdown-render.v2.js   Markdown → HTML，带白名单净化
