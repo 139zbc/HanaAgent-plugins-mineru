@@ -3,14 +3,9 @@
 用 [MinerU](https://mineru.net) 解析 PDF、图片与 Office 文档，输出 Markdown / JSON，
 可引用到对话，也可用你自己指定的 Hana 模型翻译。
 
-这是 v1 插件（`manifestVersion: 1`）迁移到 v2 App（`manifestVersion: 2`）的结果。
-迁移过程与踩过的坑见 [MIGRATION.md](./MIGRATION.md)。v1 的代码保留在 git 标签
-[`v1.0.0`](https://github.com/139zbc/HanaAgent-plugins-mineru/tree/v1.0.0)。
+v0.450.0及以下版本请用v0.1.0版本
+<img width="2702" height="1553" alt="image" src="https://github.com/user-attachments/assets/41a743bf-8686-4a9b-b7e1-81bb37d08b54" />
 
-> **从 v1 升级：先把旧插件卸掉。** 两者共用同一套工具名
-> （`mineru-document-workbench_*`），而 v1 插件在装时会在宿主里占住那些名字，
-> 导致 v2 注册失败。卸掉 v1 后重装 v2，再**新开一个对话**。
-> 卸载不会删除解析历史（留在 `<HANA_HOME>/app-data/mineru-document-workbench/`）。
 
 ## 目录结构
 
