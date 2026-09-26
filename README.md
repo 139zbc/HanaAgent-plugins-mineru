@@ -3,7 +3,8 @@
 一个 [Hana](https://github.com/liliMozi/openhanako) 插件：通过 **MinerU** API 解析文档，输出结构化的 Markdown / JSON。提供三栏工作台页面、对话内引用，以及用你自己指定的 Hana 模型翻译文档。
 
 支持的输入格式：PDF、图片（png / jpg / jpeg / jp2 / webp / gif / bmp）、DOC / DOCX、PPT / PPTX、XLS / XLSX。
-<img width="2880" height="1704" alt="image" src="https://github.com/user-attachments/assets/c8dfc7c6-9506-4c99-ad29-e103fa980c68" />
+<img width="2702" height="1553" alt="image" src="https://github.com/user-attachments/assets/000a6e45-afb3-404c-903b-364c8e071a5d" />
+
 
 
 ## 功能
