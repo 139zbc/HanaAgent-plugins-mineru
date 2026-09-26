@@ -128,20 +128,6 @@ $env:HANA_APP_TOOLS_ROOT = "<HANA_HOME>/artifacts/server/<版本>"
 node "C:\Users\Fantasy\.hanako\skills\hana-app-creator\scripts\validate_app.mjs" --dir mineru-document-workbench --json
 ```
 
-## 打包与发布
-
-```sh
-# 构建可安装包（产出 dist/app-mineru-document-workbench-<version>.zip 与 entry.json）
-$env:HANA_APP_TOOLS_ROOT = "<Hana Server 目录>"
-$env:HANA_APP_PUBLISHER  = "139zbc"
-node scripts/build-install-zip.mjs
-
-# 发布前体检：凭据、本机路径、不该发布的文件
-node scripts/preflight-secrets.mjs mineru-document-workbench
-
-# 生产边界冒烟：把交付包解压到仓库外，在没有 node_modules 的情况下导入每个入口
-node scripts/production-smoke.mjs dist/app-mineru-document-workbench-0.2.0.zip
-```
 
 ## 安装与生效
 
