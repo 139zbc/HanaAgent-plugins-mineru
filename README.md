@@ -45,7 +45,7 @@ mineru-document-workbench/      ← 应用目录。这一层就是要发布、�
 │       ├── theme-fallback.css  宿主主题变量兜底（两个页面共用）
 │       ├── app-ui.js/.css      官方控件包（随包携带，勿手改）
 │       ├── sdk.js              浏览器 SDK（hana.api / storage / clipboard）
-│       ├── cover.svg           卡片封面
+│       ├── cover.png           卡片封面（1200×1800，2:3 竖版）
 │       └── assets/             控件包的纹理图，路径由 app-ui.css 决定，勿动
 ├── assets/icon.svg             应用身份图标
 └── sdk/                        随包携带的 App SDK（入口 import 它）

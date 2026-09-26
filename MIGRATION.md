@@ -1036,6 +1036,93 @@ host === suffix || host.endsWith(suffix)
 
 ---
 
+## 八·五、页面图标的悬停变色（实测结论：App 侧做不到，已放弃自定义图标）
+
+左侧栏导航入口的图标（`contributes.cards[].pageIcon`）试过三轮，最终**移除**，
+改用宿主内置图标。原因是一个改不动的前提：**宿主的悬停变色靠 `currentColor`，
+而 App 的页面图标只能是 `<img>`**。
+
+### 宿主的机制
+
+悬停规则是 `.sidebar-activity-bar:hover { color: var(--accent) }`，图标与标签
+都从这条 `color` 取色。兄弟图标是**内联 SVG**，所以 `currentColor` 生效，
+默认态再被 `.sidebar-activity-bar svg { opacity: .45 }` 淡化。实测印证了这个模型：
+
+| 主题 | 行背景 | 标签文字（`currentColor`） | 兄弟图标实测 | 45% 混合推算 |
+| --- | --- | --- | --- | --- |
+| 暖米色 | `#EFE8DB` | `#6B6158` | `#B3ABA0` | `#B3ABA0` |
+| 中性浅色 | `#EFEFF2` | `#95959C` | `#C7C7CB` | —— |
+| 深色 | `#202C34` | `#B7C8D3` | `#64727C` | `#64727C` |
+
+### 三道墙（都验过）
+
+1. **`<img>` 里的 SVG 无法继承父页面 `currentColor`。**
+   CSS 规范：通过 `<img>` 引用的 SVG 是独立文档，处于安全静态模式，
+   父文档的 `color` 传不进去。所以不管宿主文字怎么变色，图标都是固定的一个灰。
+
+2. **插槽系统进不了侧栏。** `contributes.ui.slotContributions` 确实能让 App
+   往槽里塞按钮或 iframe，但文档明确：`slot` 不能以 `hana/` 开头——那是宿主
+   自己的槽，只走 `messageActions` / `cardChrome` / `contextMenus`。
+   侧栏导航正是宿主的槽，禁止投递。
+
+3. **宿主的内联 SVG 通路对 App 不可达。** 渲染器里确实有一条能继承 `currentColor`
+   的路（`dangerouslySetInnerHTML`，输入是卡片级 `icon`），但服务端投影把
+   app 卡片的 `icon` **硬编码为 `null`**：
+
+   ```js
+   return { pluginId: n, id: e.id, type: "webview", ..., icon: null, channel: "app", ... }
+   ```
+
+   而且卡片键白名单（`bC`）里没有 `icon`，只有 `face` / `pageIcon` 这些。
+   那条路走的是内置卡。
+
+### 曾试过的两条替代路径，都不可行
+
+- **靠半透明混背景间接跟随。** 图标渲染色 = `透明度 × 固有色 + (1−透明度) × 背景`。
+  要让图标在常态落在 187、悬停落到主题色 114：
+  `(1−a) × (240.0 − 232.7) = 187 − 114`，解出 **`a = −9`**。
+  宿主的悬停背景亮度只差 **7**，需要的差是 **73**。物理上不可能。
+  这也解释了为什么前几轮调色始终追不上——调参余地本来就不存在。
+- **改用宿主内置图标。** 这是最终采纳的方案。宿主画它自己的页面图标（内联 SVG），
+  `currentColor` + 45% 淡化，主题色与悬停都完美跟随，与左侧栏其它条目完全一致。
+  代价是丢掉 MinerU 的图形辨识度。
+
+### 悬停态实测（从截图量的）
+
+| | 行背景 | 标签文字 |
+| --- | --- | --- |
+| 常态 | `#F0F0F2`（亮度 240.0） | `#95959C` |
+| 悬停 | `#E8E8F2`（亮度 232.7） | `#636AE8`（主题色） |
+
+### 另外两个只有实测才知道的坑
+
+- **`pageIconUrl` 不带内容哈希，跨安装不变。** 地址是
+  `/api/apps/<id>/ui/assets/<文件名>`。React 用「revision + url」当 `<img>` 的 key，
+  地址不变就不重建节点，浏览器也就不重新取图，界面会一直显示第一次解码的旧图。
+  宿主给 SVG 设了 `Cache-Control: no-store`，但那只拦 HTTP 缓存，
+  拦不住「节点不重建就不发请求」这条路径。
+  **改图标内容后必须同时改文件名**，否则改动压根不会上屏。
+- **`pageIcon` 会被真正解码并做安全检查**（比封面严）。塞一个带 `<script>` 的图，
+  校验直接报 `INVALID_PAGE_ICON | app icon: SVG must not contain <script>`；
+  它还拦 `<foreignObject>` / 外链 `href` / 实体声明 / SMIL 动画。
+  而 `face.image` 的封面**完全不检查能否解码**（写坏成非法 XML 照样 0 error）。
+
+### 若要找回图标：需要宿主改一处
+
+宿主把 `pageIcon` 从 `<img>` 改成 CSS `mask` 渲染即可两全：
+
+```css
+.fpSiteNavEntryIcon {
+  mask-image: url(页面图标);
+  background-color: currentColor;   /* 于是自动跟随主题色与悬停 */
+}
+```
+
+这样既保留自定义图标，又跟随主题色与悬停。这是宿主侧的设计缺口，
+App 侧无解。
+
+---
+
 ## 九、后续待办
 
 - [ ] 在真实宿主里复核侧栏新增的选中项操作区（本轮已在 240～360px 四档宽度、
@@ -1071,7 +1158,7 @@ host === suffix || host.endsWith(suffix)
 | `node --test "tests/*.test.mjs"` | 190 pass / 0 fail |
 | `node --test "reference/v1-panel/*.test.mjs"` | 10 pass / 0 fail |
 | 全模块导入冒烟（Node，含随包 SDK 100 个模块） | 100/100 干净加载 |
-| `extension-pack.mjs --kind app` | 产出 `dist/app-mineru-document-workbench-0.2.0.zip` |
+| `extension-pack.mjs --kind app` | 产出 `dist/app-mineru-document-workbench-0.2.1.zip` |
 | `production-smoke.mjs` | 通过：入口、工具、路由、能力声明、页面资源引用、无仓库材料、无凭据 |
 | `preflight-secrets.mjs` | 通过：无敏感信息、无本机路径 |
 | 本地浏览器渲染 | 通过：控件全部挂载，布局与 Markdown 排版正常 |
@@ -1080,7 +1167,7 @@ host === suffix || host.endsWith(suffix)
 
 | 检查 | 结果 |
 | --- | --- |
-| 正式安装（`extension_manager` 本地目录安装 + 确认） | 成功；`host=on agent=on`，v0.2.0 |
+| 正式安装（`extension_manager` 本地目录安装 + 确认） | 成功；`host=on agent=on`，v0.2.1 |
 | apply 执行与工具注册 | 成功；日志 `PROBE-RESULT ok=[四个名字] fail=[]` |
 | 权限授权 | 5 项能力全部 `allowed` / `tier: always` |
 | 工具调用（新对话） | 成功；`list_jobs` 返回真实内容 `[]`，无报错 |
