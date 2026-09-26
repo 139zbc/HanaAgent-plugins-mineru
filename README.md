@@ -3,7 +3,7 @@
 用 [MinerU](https://mineru.net) 解析 PDF、图片与 Office 文档，输出 Markdown / JSON，
 可引用到对话，也可用你自己指定的 Hana 模型翻译。
 
-v0.450.0及以下版本请用v0.1.0版本
+HanaAgent版本是v0.450.0及以下版本请用v0.1.0版本
 <img width="2702" height="1553" alt="image" src="https://github.com/user-attachments/assets/41a743bf-8686-4a9b-b7e1-81bb37d08b54" />
 
 
