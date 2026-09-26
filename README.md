@@ -178,6 +178,7 @@ node scripts/production-smoke.mjs dist/app-mineru-document-workbench-0.2.0.zip
 ```sh
 $env:HANA_APP_TOOLS_ROOT = "<Hana Server 目录>"
 $env:HANA_APP_PUBLISHER  = "139zbc"
+node scripts/normalize-eol.mjs .        # 确保工作区是 LF（见下）
 node scripts/build-install-zip.mjs
 ```
 
@@ -190,6 +191,13 @@ node scripts/build-install-zip.mjs
 
 打包是确定性的：同一份目录打两次字节完全一致（实测两处构建哈希相同），
 所以同一个 tag 重新构建不会平白造成“包变了”。
+
+> 这个结论有一个前提：**工作区必须是 LF 换行**。发布包是直接从工作区目录打的，
+> 换行符也是字节，所以 CRLF 工作区会产出与 LF 工作区不同的 zip。
+> 仓库根部的 `.gitattributes`（`* text=auto eol=lf`）负责保证全新的 clone
+> 拿到的是 LF；`scripts/normalize-eol.mjs` 用于修正已经存在于磁盘上的 CRLF
+> 文件（比如从旧版本目录搬过来的）。这两处都是在保这个前提，
+> 不是风格洁癖——失掉它，“同一 tag 可重现”就不成立了。
 
 > 上传后可以把版本写进市场 `hana-marketplace` 的 `registry.json`（首次收录要提 PR）；
 > 之后目录会自动发现后续正式 Release，不必每版都提。
