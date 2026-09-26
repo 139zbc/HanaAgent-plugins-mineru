@@ -222,7 +222,7 @@ node scripts/build-install-zip.mjs
 | 键 | 默认值 | 说明 |
 | --- | --- | --- |
 | `apiBaseUrl` | `https://mineru.net` | MinerU 服务地址 |
-| `apiToken` | – | MinerU 的 Bearer Token；只有精准通道需要。设置页里明文可见，方便核对与复制 |
+| `apiToken` | – | MinerU 的 Bearer Token；只有精准通道需要。|
 | `modelVersion` | `vlm` | 默认解析方式：`vlm` / `pipeline` / `agent` |
 | `translationTargetLanguage` | `中文` | 翻译的默认目标语言 |
 | `pollIntervalMs` / `pollTimeoutMs` | – | 保留参数 |
