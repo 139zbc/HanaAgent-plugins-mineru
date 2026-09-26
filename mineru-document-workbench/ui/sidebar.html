@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>解析历史</title>
+  <!-- 官方控件样式 -->
+  <link rel="stylesheet" href="./assets/app-ui.css">
+  <!-- 宿主主题变量兜底（与主卡共用），必须在布局样式之前 -->
+  <link rel="stylesheet" href="./assets/theme-fallback.css">
+  <link rel="stylesheet" href="./assets/sidebar.css">
+</head>
+<body>
+  <!--
+    功能面板（Function Panel）侧栏。
+
+    职责约定：侧栏只做「挑选」，主卡只做「查看与操作」。
+    这里只管历史列表、刷新、单条删除与批量删除；选中哪一条通过 App 存储
+    广播给主卡，不在这里渲染任何解析结果。
+  -->
+  <main id="sidebar" data-hana-app-ui>
+    <header class="head">
+      <h2>解析历史</h2>
+      <div class="head-actions">
+        <div id="selectModeSlot" class="slot"></div>
+        <div id="reloadSlot" class="slot"></div>
+      </div>
+    </header>
+
+    <div id="jobs" class="list"></div>
+
+    <!--
+      固定置底的页脚：选中项操作 + 批量操作。
+
+      为什么这两样要在一起并且置底：
+        · 它们都是「对当前选择做什么」的控制，归为一处才好找；
+        · 列表长度是变的，如果它们跟着列表往下走，短列表时会在中间留一大段空、
+          长列表时又会被顶到看不见的地方。置底就始终在同一个位置。
+      所以：列表负责撑满剩余空间并自己滚动，页脚永远贴在底部。
+
+      操作结果与错误不在这里：它们走宿主吐司（见 sidebar.js 的 notify），
+      浮在上层、不参与布局，几秒后自己消失——不会把页脚抽高抽低。
+    -->
+    <footer class="foot">
+      <!--
+        选中项操作区。
+
+        为什么「复制指令」在侧栏而不在主卡：clipboard.writeText 的宿主白名单是
+        page / widget / settings / function-panel，而应用卡是 **card** 槽位——
+        主卡里点复制会被拒。侧栏正是 function-panel，所以零新增权限就能用。
+        职责上也顺：选中项本来就在侧栏手上。
+      -->
+      <div id="selectedActions" class="selected-actions" hidden>
+        <p id="selectedName" class="selected-name"></p>
+        <div class="selected-buttons">
+          <div id="copyRefSlot" class="slot"></div>
+          <div id="copyTranslateSlot" class="slot"></div>
+        </div>
+      </div>
+
+      <!-- 多选模式下的批量操作条（与上面的选中操作区互斥） -->
+      <div id="batchBar" class="batch" hidden>
+        <span id="batchText" class="batch-text"></span>
+        <div class="batch-actions">
+          <div id="batchAllSlot" class="slot"></div>
+          <div id="batchDeleteSlot" class="slot"></div>
+        </div>
+      </div>
+    </footer>
+
+    <!--
+      行右键菜单的挂载点。
+
+      放在 #sidebar 直系（不在 .list 里）：菜单虽然自己会 portal 到 fixed 层，
+      但挂载点必须在 data-hana-app-ui 作用域内，否则 APP_UI_SCOPE_REQUIRED。
+      同时避开 .list 的 overflow 容器，语义上也清楚：它不属于列表内容。
+    -->
+    <div id="rowMenuMount"></div>
+
+    <!--
+      确认浮层。iframe 的 sandbox 不含 allow-modals，window.confirm 不可用；
+      官方控件集里也没有 Modal，所以确认界面在页内实现（只覆盖本侧栏）。
+    -->
+    <div id="modal" class="modal" hidden>
+      <div class="modal-backdrop"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalText">
+        <p id="modalText" class="modal-text"></p>
+        <!-- 需要输入时（如重命名）在这里挂官方 TextInput；确认浮层不带输入时隐藏。 -->
+        <div id="modalField" class="modal-field" hidden></div>
+        <div id="modalActions" class="modal-actions"></div>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./assets/sidebar.js"></script>
+</body>
+</html>

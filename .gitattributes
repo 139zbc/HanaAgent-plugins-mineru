@@ -1,0 +1,23 @@
+# 换行统一：仓库里一律用 LF，检出到工作区也是 LF。
+#
+# 为什么必须有这条：本机 `core.autocrlf = true`，没有约束时 git 会在检出时把
+# 文本文件换成 CRLF。后果不是"看起来不整齐"，而是**同一份源码在不同机器上
+# 打出的包字节不同**——本项目声称打包是确定性的（同一目录打两次字节一致），
+# 那个结论只在工作区换行一致时成立。
+#
+# 另外，发布包是从工作区目录直接打的，所以工作区必须与仓库里的字节一致。
+* text=auto eol=lf
+
+# 明确按二进制处理，不做任何换行转换。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.bmp binary
+*.jp2 binary
+*.ico binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

@@ -3,11 +3,11 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { renderMarkdown, sanitizeTag, escapeHtml } from "../markdown-render.v2.js";
+import { renderMarkdown, sanitizeTag, escapeHtml } from "../mineru-document-workbench/lib/markdown-render.v2.js";
 import {
   contentTypeFor, normalizeResultRef, resolveAssetPath, listResultFiles,
   readResultAsset, createImageResolver,
-} from "../result-assets.v1.js";
+} from "../mineru-document-workbench/lib/result-assets.v2.js";
 
 // ── Markdown 渲染 ─────────────────────────────────────────────────────────────
 
@@ -181,4 +181,7 @@ test("image resolver accepts only local results or allowlisted hosts", async () 
     "https://cdn-mineru.openxlab.org.cn/pdf/x/images/a.png");
   assert.equal(resolve("file:///etc/passwd"), null);
   assert.equal(resolve(""), null);
+  // 后缀匹配必须退回点前缀：只判 endsWith 会把这些构造域名放进来。
+  assert.equal(resolve("https://notopenxlab.org.cn/a.png"), null, "notopenxlab.org.cn 不是子域");
+  assert.equal(resolve("https://evil-aliyuncs.com/a.png"), null, "evil-aliyuncs.com 不是子域");
 });

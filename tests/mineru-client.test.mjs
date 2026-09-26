@@ -3,7 +3,7 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { batchItems, downloadResult, pollBatch } from "../mineru-client.js";
+import { batchItems, downloadResult, pollBatch } from "../mineru-document-workbench/lib/mineru-client.js";
 
 function makeStoredZip(entries) {
   const chunks = [];

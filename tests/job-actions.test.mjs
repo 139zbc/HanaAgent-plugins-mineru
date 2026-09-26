@@ -3,7 +3,7 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { deleteJob, describeDeletion, isInProgressState, isInProgressJob, effectiveState } from "../job-actions.v2.js";
+import { deleteJob, describeDeletion, isInProgressState, isInProgressJob, effectiveState } from "../mineru-document-workbench/lib/job-actions.v2.js";
 
 const JOB_ID = "9e8e4938-3f27-4ef2-89d7-27f8ab627aa1";
 const BATCH_ID = "a6382aec-d809-47f5-afdc-eacdc83b5973";

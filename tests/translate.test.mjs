@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 import {
   buildSystemPrompt, chunkMarkdown, reassemble, translateText, listChatModels, ensureModelAgent, readModelAgent, translationMaxTokens, MODEL_AGENT_ID,
   TARGET_LANGUAGES, DEFAULT_TARGET_LANGUAGE, normalizeTargetLanguage,
-} from "../translate.v3.js";
+} from "../mineru-document-workbench/lib/translate.v3.js";
 
 const manifest = JSON.parse(await fs.readFile(
-  path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "manifest.json"),
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "mineru-document-workbench", "manifest.json"),
   "utf8",
 ));
 
@@ -88,7 +88,8 @@ test("ensureModelAgent and readModelAgent round-trip through the same agent", as
 });
 
 test("the language list matches the manifest enum and defaults to 中文", () => {
-  const enumList = manifest.contributes.configuration.properties.translationTargetLanguage.enum;
+  // v2：配置 schema 从 contributes.configuration 挪到了 contributes.settings.schema
+  const enumList = manifest.contributes.settings.schema.properties.translationTargetLanguage.enum;
   assert.deepEqual([...TARGET_LANGUAGES], enumList, "server list and manifest enum must not drift apart");
   assert.equal(DEFAULT_TARGET_LANGUAGE, "中文");
   assert.equal(enumList[0], DEFAULT_TARGET_LANGUAGE);

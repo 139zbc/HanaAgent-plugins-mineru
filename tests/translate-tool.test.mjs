@@ -3,8 +3,8 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { execute, parameters, sessionPermission } from "../tools/translate_result.js";
-import { getJob } from "../job-store.v6.js";
+import { execute, parameters, sessionPermission } from "../mineru-document-workbench/lib/tools/translate_result.js";
+import { getJob } from "../mineru-document-workbench/lib/job-store.v6.js";
 
 const JOB_ID = "4f8f0d1c-6f2a-4f3b-9a3e-2c1d5b7e9a01";
 const BATCH_ID = "9c1b2d3e-4f50-4a6b-8c7d-1e2f3a4b5c6d";

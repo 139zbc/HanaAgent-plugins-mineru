@@ -1,0 +1,61 @@
+/*
+ * 宿主主题变量兜底（panel 与 sidebar 共用）
+ * ==========================================
+ *
+ * 官方控件的样式大量引用一套宿主主题变量（--bg-card / --accent / --text /
+ * --border / --shadow …），而且**多数没有写兜底值**。
+ *
+ * 这些变量由宿主主题样式表定义，但那份样式表是按 `[data-theme="xxx"]`
+ * 选择器写的，且 SDK 只在收到主题变更事件时才注入一次。卡片与功能面板
+ * 都是独立 iframe，拿不到主窗口的变量，于是 `var(--bg-card)` 解析为空——
+ * 下拉浮层这类没写兜底值的地方就会变成透明底，盖在正文上看不清。
+ *
+ * 下面用 Hana 默认主题 warm-paper 的真实取值补上这套变量，作为底线。
+ * 页面脚本还会把主题样式表注入 head（排在本文件之后），同优先级下后者
+ * 生效，所以真实宿主里仍会跟随宿主主题。
+ *
+ * 两个页面都必须先引本文件、再引各自的布局样式。
+ */
+:root {
+  --bg: #F8F4ED;
+  --bg-card: #FCFAF5;
+  --bg-glass: rgba(250, 248, 242, 0.92);
+  --sidebar-bg: #F4F0EA;
+
+  --text: #3B3D3F;
+  --text-light: #6B6F73;
+  --text-muted: #8E9196;
+
+  --border: rgba(122, 96, 88, 0.18);
+  --border-light: rgba(122, 96, 88, 0.10);
+  --shadow: rgba(59, 61, 63, 0.09);
+
+  --accent: #537D96;
+  --accent-hover: #456A80;
+  --accent-light: rgba(83, 125, 150, 0.08);
+  --accent-rgb: 83, 125, 150;
+
+  --danger: #8B3A3A;
+  --danger-rgb: 139, 58, 58;
+  --green: #7BAE7F;
+  --green-rgb: 123, 174, 127;
+  --coral: #EC8F8D;
+  --coral-rgb: 236, 143, 141;
+
+  --overlay-subtle: rgba(0, 0, 0, 0.03);
+  --overlay-light: rgba(0, 0, 0, 0.05);
+  --overlay-medium: rgba(0, 0, 0, 0.08);
+  --overlay-strong: rgba(0, 0, 0, 0.15);
+
+  --tool-bg: rgba(0, 0, 0, 0.03);
+  --tool-text: #6B6F73;
+  --user-bg: rgba(83, 125, 150, 0.08);
+  --attach-bg: rgba(0, 0, 0, 0.04);
+  --drop-overlay-bg: rgba(248, 244, 237, 0.85);
+  --jian-note-bg: #FAF5E9;
+  --jian-note-border: rgba(180, 160, 130, 0.15);
+  --hana-text: #2B3A4E;
+  --mood-bg: rgba(125, 28, 74, 0.04);
+  --mood-text: #7D1C4A;
+  --mood-border: rgba(125, 28, 74, 0.18);
+}

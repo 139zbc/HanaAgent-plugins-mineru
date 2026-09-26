@@ -1,21 +1,15 @@
-# Dependencies (this plugin has none, but keep these out of the repo)
-node_modules/
-package-lock.json
-
-# Local Hana / plugin runtime data — never commit credentials, results or history
-config.json
-jobs/
-recovered/
-plugin-data/
-*.zip
-
-# Test and delivery artifacts
-test-fixtures/
+# 构建产物与本地环境
 dist/
+node_modules/
 
-# Editor / OS noise
+# 编辑器与系统
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-*.log
+
+# 绝不入库的运行期数据
+config.json
+jobs/
+recovered/
+*.zip

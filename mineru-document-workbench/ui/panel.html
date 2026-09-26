@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MinerU 文档解析</title>
+  <!-- 官方控件样式：提供宿主一致的按钮 / 下拉 / 页签外观与交互 -->
+  <link rel="stylesheet" href="./assets/app-ui.css">
+  <!-- 宿主主题变量兜底（与侧栏共用），必须在布局样式之前 -->
+  <link rel="stylesheet" href="./assets/theme-fallback.css">
+  <link rel="stylesheet" href="./assets/panel.css">
+</head>
+<body>
+  <!--
+    data-hana-app-ui 是官方控件的挂载作用域：没有它，mountAppUi 会以
+    APP_UI_SCOPE_REQUIRED 拒绝。两栏布局本身由 panel.css 决定，官方控件只负责
+    它内部那些原子件（按钮 / 下拉 / 页签 / 状态）。
+
+    解析历史已移到宿主的功能面板（侧栏）；主卡只负责「查看与操作」，
+    见 MIGRATION.md 的分工约定。选中态由侧栏经 App 存储广播过来。
+  -->
+  <main id="workbench" data-hana-app-ui>
+    <!-- ── 结果预览 ──────────────────────────────────────────────────── -->
+    <section class="col col-viewer">
+      <header class="viewer-head">
+        <div class="viewer-title">
+          <h1 id="fileTitle">MinerU 文档工作台</h1>
+          <p id="fileMeta" class="meta"></p>
+        </div>
+        <!--
+          导出入口收在标题栏右侧：一个格式下拉 + 一个另存按钮。
+          两种格式的差别（zip 保目录 / inline 单文件）在 export-bundle.v1.js 头部有说明。
+          card 槽位不允许写剪贴板，但允许 resource.saveFile
+          （白名单 ["card","preview"]），所以这里是“另存”而非“复制”。
+        -->
+        <div class="viewer-actions">
+          <div id="exportFormatSlot" class="slot"></div>
+          <div id="saveSlot" class="slot"></div>
+        </div>
+      </header>
+      <div id="tabsSlot" class="slot"></div>
+      <div id="translationBar" class="translation-bar" hidden>
+        <div id="langSlot" class="slot lang-slot"></div>
+        <span id="translationMeta" class="hint"></span>
+      </div>
+      <!--
+        预览内容是服务端渲染并白名单净化过的 HTML，属于文档而不是界面控件，
+        因此直接插入 innerHTML，不经过官方控件。
+      -->
+      <div id="preview" class="preview markdown-body"></div>
+    </section>
+
+    <!-- ── 新建解析与翻译 ────────────────────────────────────────────── -->
+    <aside class="col col-actions">
+      <section class="group">
+        <h2>新建解析</h2>
+
+        <!--
+          上传区：三种入口合一。
+            · 点一下 → 宿主的选择器（hana.resources.pick）
+            · 拖进来 → 拖放（字节上传到后端，浏览器不给路径）
+            · 粘贴   → 剪贴板里的文件 / 截图
+          官方控件里没有拖放区，所以外壳自绘；内部的按钮用官方 Button。
+        -->
+        <div id="dropZone" class="drop-zone" role="button" tabindex="0"
+             aria-label="选择、拖入或粘贴要解析的文件">
+          <div id="dropIcon" class="drop-icon" aria-hidden="true"></div>
+          <p id="dropTitle" class="drop-title">把文件拖到这里</p>
+          <p id="dropHint" class="drop-sub">或点击选择，也可以直接粘贴</p>
+          <div id="pickSlot" class="slot drop-action"></div>
+        </div>
+        <div id="selectionRow" class="selection-row" hidden>
+          <span id="selection" class="selection-name"></span>
+          <div id="clearSlot" class="slot"></div>
+        </div>
+        <p id="uploadNote" class="hint"></p>
+
+        <div class="field">
+          <span class="field-label">解析方式</span>
+          <div id="modeSlot" class="slot"></div>
+        </div>
+        <p id="modeHint" class="hint"></p>
+        <div id="ocrSlot" class="slot"></div>
+        <div id="submitSlot" class="slot"></div>
+      </section>
+
+      <section class="group">
+        <h2>翻译选中文档</h2>
+        <div class="field">
+          <span class="field-label">目标语言</span>
+          <div id="translateLangSlot" class="slot"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">翻译模型</span>
+          <div id="translateModelSlot" class="slot"></div>
+        </div>
+        <div id="translateBtnSlot" class="slot"></div>
+        <div id="translateCancelSlot" class="slot"></div>
+        <p id="translateStatus" class="hint"></p>
+      </section>
+
+      <p class="hint">在左侧栏选择一条解析记录查看结果；用记录右侧的刷新图标查询进度。上传到 MinerU 后异步处理。</p>
+      <p class="hint">要把结果带进对话，直接说一句「引用这条解析结果」就行，不用复制粘贴。</p>
+      <p id="status" class="status" role="status"></p>
+    </aside>
+  </main>
+  <script type="module" src="./assets/panel.js"></script>
+</body>
+</html>

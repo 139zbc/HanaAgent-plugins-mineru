@@ -6,8 +6,8 @@ import path from "node:path";
 import {
   AGENT_LIMITS, agentErrorText, agentState, downloadAgentMarkdown,
   submitAgentFile, getAgentResult, queryByChannel, submitByMode,
-} from "../parse-channels.v1.js";
-import { sanitizePrecisionModel } from "../mineru-client.js";
+} from "../mineru-document-workbench/lib/parse-channels.v1.js";
+import { sanitizePrecisionModel } from "../mineru-document-workbench/lib/mineru-client.js";
 
 // 记录一次请求，便于断言方法/URL/请求头。
 function recordingCtx(handler) {

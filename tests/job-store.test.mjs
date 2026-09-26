@@ -3,8 +3,8 @@ import test from "node:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { findJobByBatch, isSafeResultId, jobStateLabel, listJobs, localResult, normalizeProgress, normalizeQueue, previewJob, pruneJobs, resolveStoredResultPath, updateJob } from "../job-store.v6.js";
-import { execute as recoverBatch } from "../tools/recover_batch.js";
+import { findJobByBatch, isSafeResultId, jobStateLabel, listJobs, localResult, normalizeProgress, normalizeQueue, previewJob, pruneJobs, resolveStoredResultPath, updateJob } from "../mineru-document-workbench/lib/job-store.v6.js";
+import { execute as recoverBatch } from "../mineru-document-workbench/lib/tools/recover_batch.js";
 
 const jobId = "9e8e4938-3f27-4ef2-89d7-27f8ab627aa1";
 const batchId = "d7193db2-691c-4f45-ad0d-67a101fbd29a";

@@ -1,0 +1,111 @@
+{
+  "manifestVersion": 2,
+  "id": "mineru-document-workbench",
+  "name": "MinerU 文档解析",
+  "version": "0.2.0",
+  "entry": "index.js",
+  "icon": "assets/icon.svg",
+  "description": "用 MinerU 解析 PDF、图片与 Office 文档，输出 Markdown 与 JSON，并可将结果直接引用到对话。",
+  "minAppVersion": "0.1050.9",
+  "capabilities": [
+    "app/tools.expose-to-model",
+    "app/session.stage-file",
+    "app/models.infer",
+    "app/resources.read",
+    "app/resources.write",
+    "app/ui.clipboard-write"
+  ],
+  "network": {
+    "allowedHosts": ["mineru.net", "*.openxlab.org.cn", "*.aliyuncs.com"],
+    "methods": ["GET", "POST", "PUT"],
+    "defaultTimeoutMs": 60000,
+    "maxResponseBytes": 52428800
+  },
+  "contributes": {
+    "settings": {
+      "title": "MinerU 文档解析",
+      "schema": {
+        "properties": {
+          "apiBaseUrl": {
+            "type": "string",
+            "default": "https://mineru.net",
+            "title": "API 地址",
+            "description": "MinerU 服务地址，一般无需修改。"
+          },
+          "apiToken": {
+            "type": "string",
+            "sensitive": false,
+            "title": "API Token",
+            "description": "MinerU 的 Bearer Token，在此直接可见，方便核对与复制。选择「MinerU VLM」或「MinerU」时需要填写；选择「Agent 轻量解析 API」时可留空。"
+          },
+          "modelVersion": {
+            "type": "string",
+            "enum": ["vlm", "pipeline", "agent"],
+            "default": "vlm",
+            "title": "默认解析方式",
+            "description": "vlm / pipeline 走 MinerU 精准解析 API（需 Token）；agent 走 Agent 轻量解析 API（免 Token，≤10MB、≤20 页、仅 Markdown）。也可在工作台页面上临时选择。"
+          },
+          "pollIntervalMs": {
+            "type": "number",
+            "default": 2000,
+            "minimum": 1000,
+            "maximum": 30000,
+            "title": "轮询间隔（毫秒）",
+            "description": "保留参数，供后续轮询逻辑使用。"
+          },
+          "pollTimeoutMs": {
+            "type": "number",
+            "default": 600000,
+            "minimum": 10000,
+            "maximum": 1800000,
+            "title": "轮询超时（毫秒）",
+            "description": "保留参数，供后续轮询逻辑使用。"
+          },
+          "translationTargetLanguage": {
+            "type": "string",
+            "enum": [
+              "中文",
+              "繁体中文",
+              "英语",
+              "日语",
+              "韩语",
+              "法语",
+              "德语",
+              "西班牙语",
+              "葡萄牙语",
+              "意大利语",
+              "俄语",
+              "阿拉伯语",
+              "泰语",
+              "越南语"
+            ],
+            "default": "中文",
+            "title": "默认目标语言",
+            "description": "翻译时翻成的语言。工作台页面上的语言列表与此保持一致。"
+          }
+        }
+      }
+    },
+    "cards": [
+      {
+        "id": "panel",
+        "title": "MinerU 文档解析",
+        "description": "MinerU 文档解析工作台：解析历史、结果预览与文档翻译。",
+        "route": "/panel.html",
+        "realization": "page",
+        "siteNavEntry": true,
+        "fpFullPanel": true,
+        "cardForm": "flush",
+        "closable": false,
+        "functionPanel": {
+          "id": "history",
+          "label": "解析历史",
+          "route": "/sidebar.html"
+        },
+        "face": {
+          "image": "assets/cover.svg"
+        }
+      }
+    ]
+  }
+}

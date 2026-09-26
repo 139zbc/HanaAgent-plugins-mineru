@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="MinerU 文档解析">
+  <defs>
+    <linearGradient id="cover-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B2A55"/>
+      <stop offset="0.5" stop-color="#20418F"/>
+      <stop offset="1" stop-color="#123066"/>
+    </linearGradient>
+    <radialGradient id="cover-glow" cx="0.78" cy="0.18" r="0.9">
+      <stop offset="0" stop-color="#6FA8FF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#6FA8FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cover-rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7FB4FF"/>
+      <stop offset="1" stop-color="#7FB4FF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#cover-bg)"/>
+  <rect width="1200" height="630" fill="url(#cover-glow)"/>
+  <g opacity="0.09" fill="#FFFFFF" transform="translate(940 300) scale(17) translate(-12 -12)">
+    <circle cx="18.4427" cy="3.86898" r="1.2811"/>
+    <circle cx="14.087" cy="5.1491" r="1.2811"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.05175 11.2368C8.05175 13.4605 9.14375 15.4293 10.8211 16.6371C11.8241 15.7389 12.4551 14.4345 12.4551 12.9828V9.39673C12.4551 8.85661 12.8197 8.38448 13.3426 8.24757L19.8924 6.53265C20.6459 6.33534 21.3826 6.90341 21.3826 7.6818L21.3826 12.0452C21.3826 17.2179 17.1861 21.4111 12.0095 21.4111L11.9942 21.4111C6.81758 21.4111 2.62109 17.2179 2.62109 12.0452V9.03388C2.62109 8.49175 2.9884 8.01839 3.51385 7.88336L6.56677 7.09882C7.31904 6.9055 8.05175 7.47318 8.05175 8.24934V11.2368ZM3.9798 12.0452C3.9798 13.8476 4.57565 15.5108 5.58124 16.849C6.04996 17.4728 6.7655 17.8884 7.54573 17.8884V17.8884C8.28848 17.8884 8.9927 17.7236 9.62376 17.4286C7.83439 15.9596 6.69304 13.7314 6.69304 11.2368V8.46821L3.9798 9.16546V12.0452Z"/>
+  </g>
+  <g transform="translate(112 214) scale(3.4) translate(-12 -12)">
+    <circle cx="18.4427" cy="3.86898" r="1.2811" fill="#EAF1FF"/>
+    <circle cx="14.087" cy="5.1491" r="1.2811" fill="#EAF1FF"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" fill="#EAF1FF" d="M8.05175 11.2368C8.05175 13.4605 9.14375 15.4293 10.8211 16.6371C11.8241 15.7389 12.4551 14.4345 12.4551 12.9828V9.39673C12.4551 8.85661 12.8197 8.38448 13.3426 8.24757L19.8924 6.53265C20.6459 6.33534 21.3826 6.90341 21.3826 7.6818L21.3826 12.0452C21.3826 17.2179 17.1861 21.4111 12.0095 21.4111L11.9942 21.4111C6.81758 21.4111 2.62109 17.2179 2.62109 12.0452V9.03388C2.62109 8.49175 2.9884 8.01839 3.51385 7.88336L6.56677 7.09882C7.31904 6.9055 8.05175 7.47318 8.05175 8.24934V11.2368ZM3.9798 12.0452C3.9798 13.8476 4.57565 15.5108 5.58124 16.849C6.04996 17.4728 6.7655 17.8884 7.54573 17.8884V17.8884C8.28848 17.8884 8.9927 17.7236 9.62376 17.4286C7.83439 15.9596 6.69304 13.7314 6.69304 11.2368V8.46821L3.9798 9.16546V12.0452Z"/>
+  </g>
+  <text x="320" y="278" font-family="Segoe UI, system-ui, sans-serif" font-size="104" font-weight="600" fill="#FFFFFF" letter-spacing="-1">MinerU</text>
+  <rect x="324" y="318" width="300" height="3" rx="1.5" fill="url(#cover-rule)"/>
+  <text x="322" y="378" font-family="Segoe UI, system-ui, sans-serif" font-size="34" font-weight="400" fill="#B9CCF5">文档解析工作台</text>
+  <text x="322" y="430" font-family="Segoe UI, system-ui, sans-serif" font-size="25" font-weight="400" fill="#8FA9DE">PDF · 图片 · Office　→　Markdown / JSON / 译文</text>
+</svg>

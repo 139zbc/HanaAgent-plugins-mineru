@@ -1,0 +1,356 @@
+/*
+ * 解析历史侧栏样式（功能面板）
+ * ==========================
+ *
+ * 功能面板是个窄容器（约 350px），所以：
+ *   - 行内标题/描述必须可缩（min-width:0 + 省略号），
+ *   - 操作按钮必须不可缩（flex:none），否则会像官方 ListRow 的溢出菜单那样被裁掉。
+ * 控件外观归官方 app-ui.css，主题变量兜底来自 theme-fallback.css。
+ */
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; min-height: 100%; height: 100%; }
+
+body {
+  background: var(--sidebar-bg, #F4F0EA);
+  color: var(--text, #3B3D3F);
+  font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+  font-size: 13px;
+}
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  height: 100%;
+}
+
+/* ── 头部 ──────────────────────────────────────────────────────────────── */
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+
+/* 官方控件的挂载位：本身不画东西。 */
+.slot { display: block; }
+.ui-slot { display: block; }
+.slot:empty { display: none; }
+
+/* ── 历史行 ────────────────────────────────────────────────────────────── */
+
+.list {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-width: 0;
+  /*
+   * 列表负责撑满所有剩余空间，页脚才能被顶到底部。
+   * `min-height: 0` 是必需的：flex 子项默认 min-height:auto，
+   * 在内部内容很高时会拒绝收缩，导致整个侧栏溢出、页脚被顶出视野。
+   */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 7px 6px 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+}
+
+.row:hover { background: var(--overlay-subtle, rgba(0, 0, 0, 0.03)); }
+
+.row-selected {
+  background: var(--accent-light, rgba(83, 125, 150, 0.08));
+  border-color: color-mix(in srgb, var(--accent, #537D96) 30%, transparent);
+}
+
+.row-pick { flex: none; display: flex; align-items: center; }
+
+/* 批量模式下已勾选的行。 */
+.row-picked {
+  background: var(--accent-light, rgba(83, 125, 150, 0.08));
+  border-color: color-mix(in srgb, var(--accent, #537D96) 30%, transparent);
+}
+
+/* 主体：可缩，长文件名走省略号而不是把按钮挤出容器。 */
+.row-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.row-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-muted, #8E9196);
+}
+
+.row-failed .row-name { color: var(--danger, #8B3A3A); }
+
+/* 刷新：中性色，常态可见；悬停突出。排在删除左侧。 */
+.row-refresh {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-muted, #8E9196);
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+.row:hover .row-refresh,
+.row-selected .row-refresh { opacity: 1; }
+
+.row-refresh:hover:not(:disabled) {
+  background: var(--accent-light, rgba(83, 125, 150, 0.08));
+  color: var(--accent, #537D96);
+}
+
+.row-refresh:disabled { cursor: default; }
+
+/* 刷新中：转圈，给用户一个“确实在查”的反馈；点下去毫无反应会被当成坏了。 */
+.row-refresh.busy svg { animation: mineru-spin 0.9s linear infinite; }
+
+@keyframes mineru-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-refresh.busy svg { animation: none; opacity: 0.45; }
+}
+
+/* 垃圾桶：flex:none 是刻意的——早先官方 ListRow 的溢出菜单就是在这里被裁掉的。
+   默认半透明但可见；指向该行或已选中时变实，悬停按钮本身变危险色。 */
+.row-del {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-muted, #8E9196);
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+.row:hover .row-del,
+.row-selected .row-del,
+.row-picked .row-del { opacity: 1; }
+
+.row-del:hover {
+  background: color-mix(in srgb, var(--danger, #8B3A3A) 12%, transparent);
+  color: var(--danger, #8B3A3A);
+}
+
+.row-refresh:focus-visible,
+.row-del:focus-visible,
+.row-main:focus-visible {
+  outline: 2px solid var(--accent, #537D96);
+  outline-offset: 1px;
+}
+
+/* ── 批量操作条 ────────────────────────────────────────────────────────── */
+
+/*
+ * 窄容器友好：文字 + 两个按钮固定占 236px 内容宽，面板窄于 ~260px 就会溢出
+ * （实测 260px 时溢出 2px，越窄越明显）。所以这里允许换行：
+ * 装得下时一行（文字在左、操作在右）；装不下时操作条落到下一行。
+ */
+.batch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border, rgba(122, 96, 88, 0.18));
+  border-radius: 9px;
+  background: var(--bg-card, #FCFAF5);
+}
+
+.batch-text {
+  flex: 1 1 auto;
+  /* min-width:0 是关键：默认 min-width:auto 会让 nowrap 的文字拒绍收缩，
+     整条就被撑破而不是换行。 */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--text-light, #6B6F73);
+}
+
+.batch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  /* flex-shrink:1 + min-width:0：让这组按钮在极端窄的容器里能被约束到行宽，
+     从而触发自己的换行（否者它以 max-content 宽度挺出去，内层永远换不了行）。 */
+  flex: 0 1 auto;
+  min-width: 0;
+  /* 换行到下一行时靠右对齐，与上面一行形成同一条视觉右边界。 */
+  margin-left: auto;
+}
+
+/* ── 固定置底的页脚（选中操作 + 批量操作 + 状态）────────────────────────── */
+
+.foot {
+  /*
+   * flex:none —— 不参与伸缩：由 .list 把空间吃掉，页脚自然贴底。
+   * 尺寸随内容变，所以短列表时也不会在中间留空。
+   */
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* ── 选中项操作区 ──────────────────────────────────────────────────── */
+
+.selected-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border, rgba(122, 96, 88, 0.18));
+  border-radius: 9px;
+  background: var(--bg-card, #FCFAF5);
+}
+
+.selected-name {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--text-light, #6B6F73);
+}
+
+.selected-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+/*
+ * 两个按钮等宽且自适应：
+ *   · 放得下时并排、平分宽度（flex-grow）；
+ *   · 放不下时各自占满一行（换行），而不是一个字一个字挤在一起。
+ * `min-width: max-content` 是关键：没有它，flex 会把按钮压到比文字还窄，
+ * 文字要么溢出要么被裁；有了它，宁可换行也不裁字。
+ */
+.selected-buttons .slot {
+  flex: 1 1 auto;
+  min-width: max-content;
+}
+
+/*
+ * 官方按钮按内容宽度渲染，不会自动填满容器——不补这一条，两个按钮会各自
+ * 左对齐、右侧大片留白（看起来像没对齐）。填满后：
+ *   并排时 → 两个等宽按钮；堆叠时 → 两个通栏按钮。两种都对。
+ */
+.selected-buttons .slot button {
+  width: 100%;
+}
+
+/* ── 确认浮层 ──────────────────────────────────────────────────────────── */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-medium, rgba(0, 0, 0, 0.08));
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border, rgba(122, 96, 88, 0.18));
+  border-radius: 10px;
+  background: var(--bg-card, #FCFAF5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+
+.modal-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text-light, #6B6F73);
+  overflow-wrap: anywhere;
+}
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 6px; }
+
+/* 重命名之类的输入区。.modal-card 已是 grid + gap，这里只管宽度。 */
+.modal-field { min-width: 0; }
+.modal-field .slot { display: block; }
+.modal-field input { width: 100%; }

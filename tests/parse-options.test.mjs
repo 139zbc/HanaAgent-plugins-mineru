@@ -4,7 +4,7 @@ import {
   PARSE_MODES, DEFAULT_PARSE_MODE, CHANNELS, AGENT_LIMITS, AGENT_MODE_ID,
   normalizeParseMode, parseModeLabel, resolveConfiguredMode, modeById, modeFor,
   modeRequiresToken, modeProvidesJson,
-} from "../parse-options.v2.js";
+} from "../mineru-document-workbench/lib/parse-options.v2.js";
 
 test("exposes three parse modes across two channels", () => {
   assert.deepEqual(PARSE_MODES.map((mode) => mode.id), ["vlm", "pipeline", "agent"]);

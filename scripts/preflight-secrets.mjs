@@ -35,6 +35,11 @@ const FORBIDDEN_FILES = [
   /\.pdf$/,
 ];
 
+// 第三方声明文件里出现作者邮箱是许可证要求（MIT/Apache 都要求保留归属），
+// 不是你的个人痕迹。这类文件只做凭据扫描，不做本机痕迹扫描。
+// 注意：不要把整个随包 sdk/ 目录排除掉——那里的代码也应当扫一遍密钥。
+const NOTICE_FILE = /(THIRD_PARTY_NOTICES\.txt|\.LEGAL\.txt)$/i;
+
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (SKIP_DIRS.has(entry.name)) continue;
@@ -58,7 +63,8 @@ for (const file of files) {
   let text;
   try { text = fs.readFileSync(file, "utf8"); } catch { continue; }
   const lines = text.split(/\r?\n/);
-  for (const group of [SECRET_PATTERNS, LOCAL_PATTERNS]) {
+  const groups = NOTICE_FILE.test(rel) ? [SECRET_PATTERNS] : [SECRET_PATTERNS, LOCAL_PATTERNS];
+  for (const group of groups) {
     for (const rule of group) {
       lines.forEach((line, index) => {
         const match = rule.re.exec(line);

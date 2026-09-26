@@ -1,62 +1,42 @@
-// 构建可直接安装的插件包（GitHub Release 资产）。
+// 构建可安装的 App 包（GitHub Release 资产）。
 //
-// 与仓库的区别：只打包运行时文件，manifest.json 位于 zip 根目录。
-// 排除 tests/ docs/ scripts/ LICENSE .gitignore —— 它们属于仓库，不属于安装包。
+// v2 不再自己写压缩逻辑：官方打包器 extension-pack.mjs 是打包 App 的唯一正路，
+// 它会在打包前跑一遍静态校验，并产出 <id>-<version>.zip 与配套的 entry.json。
 //
-// 用法: node scripts/build-install-zip.mjs [outputDir]
+// 关键前提：应用目录（mineru-document-workbench/）本身就是要发布的东西。
+// tests/ docs/ scripts/ reference/ 都在应用目录之外，所以任何打包器都不会误装它们。
+//
+// 用法: node scripts/build-install-zip.mjs [outDir]
+// 需要: HANA_APP_TOOLS_ROOT 指向 Hana Server 安装目录（含 APPS.md 与 scripts/extension-pack.mjs）
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const root = process.cwd();
-const outDir = path.resolve(process.argv[2] || root);
+const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, "..");
+const appDir = path.join(repoRoot, "mineru-document-workbench");
+const outDir = path.resolve(process.argv[2] || path.join(repoRoot, "dist"));
 
-const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
-const EXCLUDED_TOP_LEVEL = new Set(["tests", "docs", "scripts"]);
-const EXCLUDED_FILES = new Set(["LICENSE", ".gitignore"]);
-
-function collect(dir, prefix = "") {
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (!prefix && EXCLUDED_TOP_LEVEL.has(entry.name)) continue;
-    if (!prefix && EXCLUDED_FILES.has(entry.name)) continue;
-    if (entry.name === ".git") continue;
-    if (entry.isDirectory()) out.push(...collect(path.join(dir, entry.name), rel));
-    else out.push(rel);
-  }
-  return out;
+const toolsRoot = process.env.HANA_APP_TOOLS_ROOT || process.env.HANA_ROOT;
+if (!toolsRoot || !fs.existsSync(path.join(toolsRoot, "scripts", "extension-pack.mjs"))) {
+  throw new Error(
+    "需要 HANA_APP_TOOLS_ROOT 指向 Hana Server 安装目录（内含 APPS.md 与 scripts/extension-pack.mjs）",
+  );
+}
+if (!fs.existsSync(path.join(appDir, "manifest.json"))) {
+  throw new Error(`应用目录不完整，找不到 ${path.join(appDir, "manifest.json")}`);
 }
 
-const files = collect(root).sort();
-if (!files.includes("manifest.json")) {
-  throw new Error("manifest.json must sit at the zip root; refusing to build");
-}
-
-const staging = fs.mkdtempSync(path.join(process.env.TEMP || "/tmp", "mineru-install-build-"));
-try {
-  for (const rel of files) {
-    const target = path.join(staging, rel);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(path.join(root, rel), target);
-  }
-  const zipName = `${manifest.id}-${manifest.version}.zip`;
-  const zipPath = path.join(outDir, zipName);
-  fs.rmSync(zipPath, { force: true });
-  // PowerShell 的 Compress-Archive 在各平台上都有；这里用系统 tar 兜底不必要，
-  // 因为本项目只支持在 Windows/macOS/Linux 上用 node 运行，压缩交给 PowerShell 即可。
-  execFileSync("powershell", [
-    "-NoProfile",
-    "-Command",
-    `Compress-Archive -Path '${path.join(staging, "*")}' -DestinationPath '${zipPath}' -Force`,
-  ], { stdio: "inherit" });
-  const bytes = fs.readFileSync(zipPath);
-  const { createHash } = await import("node:crypto");
-  console.log(`\n包名: ${zipName}`);
-  console.log(`文件数: ${files.length}`);
-  console.log(`大小: ${bytes.length} 字节`);
-  console.log(`sha256: ${createHash("sha256").update(bytes).digest("hex")}`);
-  console.log(`路径: ${zipPath}`);
-} finally {
-  fs.rmSync(staging, { recursive: true, force: true });
-}
+fs.mkdirSync(outDir, { recursive: true });
+execFileSync(
+  process.execPath,
+  [
+    path.join(toolsRoot, "scripts", "extension-pack.mjs"),
+    "--kind", "app",
+    "--dir", appDir,
+    "--publisher", process.env.HANA_APP_PUBLISHER || "139zbc",
+    "--out", outDir,
+  ],
+  { stdio: "inherit" },
+);
